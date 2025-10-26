@@ -1,0 +1,27 @@
+{
+  "background_color": "#ffffff",
+  "description": "A product oYour AI-powered mood companion that understands emotions and uplifts your spirit with personalized messages.f emergent.sh",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "MoodMate",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "MoodMate",
+  "start_url": "/",
+  "theme_color": "#ff6b81",
+  "icons": [
+    {
+      "src": "https://mood-lifter-12.emergent.host/favicon.ico",
+      "type": "image/x-icon",
+      "isSquare": false,
+      "isPng": false,
+      "isWebp": false,
+      "isJpg": false,
+      "width": 0,
+      "is512x512": false,
+      "is256x256": false,
+      "is192x192": false
+    }
+  ],
+  "id": "/moodmate"
+}
