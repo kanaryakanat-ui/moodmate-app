@@ -42,6 +42,24 @@ const MoodMate = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [savedMessages, setSavedMessages] = useState([]);
+  const [isLoadingSaved, setIsLoadingSaved] = useState(false);
+
+  // Load saved messages on mount
+  useEffect(() => {
+    loadSavedMessages();
+  }, []);
+
+  const loadSavedMessages = async () => {
+    try {
+      setIsLoadingSaved(true);
+      const response = await axios.get(`${API}/saved-messages`);
+      setSavedMessages(response.data.messages);
+    } catch (error) {
+      console.error('Error loading saved messages:', error);
+    } finally {
+      setIsLoadingSaved(false);
+    }
+  };
 
   const handleGenerate = async () => {
     if (!selectedEmotion || !selectedLanguage) {
@@ -56,12 +74,23 @@ const MoodMate = () => {
     setIsGenerating(true);
     setIsCopied(false);
     
-    // Simulate API call with mock data
-    setTimeout(() => {
-      const generatedMessage = generateMockMessage(selectedEmotion, selectedLanguage);
-      setMessage(generatedMessage);
+    try {
+      const response = await axios.post(`${API}/generate-message`, {
+        emotion: selectedEmotion,
+        language: selectedLanguage
+      });
+      
+      setMessage(response.data.message);
+    } catch (error) {
+      console.error('Error generating message:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to generate message. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
       setIsGenerating(false);
-    }, 800);
+    }
   };
 
   const handleCopy = async () => {
@@ -76,20 +105,30 @@ const MoodMate = () => {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (message) {
-      const newMessage = {
-        id: Date.now(),
-        emotion: selectedEmotion,
-        language: selectedLanguage,
-        text: message,
-        timestamp: new Date().toISOString()
-      };
-      setSavedMessages([newMessage, ...savedMessages]);
-      toast({
-        title: 'Saved!',
-        description: 'Message saved successfully.'
-      });
+      try {
+        await axios.post(`${API}/save-message`, {
+          emotion: selectedEmotion,
+          language: selectedLanguage,
+          message: message
+        });
+        
+        toast({
+          title: 'Saved!',
+          description: 'Message saved successfully.'
+        });
+        
+        // Reload saved messages
+        await loadSavedMessages();
+      } catch (error) {
+        console.error('Error saving message:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to save message. Please try again.',
+          variant: 'destructive'
+        });
+      }
     }
   };
 
